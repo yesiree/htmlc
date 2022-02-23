@@ -1,0 +1,58 @@
+{
+  "name": "@yesiree/htmlc",
+  "version": "0.0.0",
+  "description": "A simple tool for compiling HTML files",
+  "type": "module",
+  "files": [
+    "./index.js",
+    "./index.d.ts"
+  ],
+  "main": "./index.js",
+  "bin": {
+    "htmlc": "index.js"
+  },
+  "scripts": {
+    "build": "rimraf ./index.js ./index.d.ts && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yesiree/htmlc.git"
+  },
+  "keywords": [
+    "html",
+    "compile",
+    "minify",
+    "css",
+    "sass",
+    "scss",
+    "style",
+    "script",
+    "javascript",
+    "js"
+  ],
+  "author": "Trevor Reed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yesiree/htmlc/issues"
+  },
+  "homepage": "https://github.com/yesiree/htmlc#readme",
+  "dependencies": {
+    "chokidar": "^3.5.2",
+    "cssnano": "^5.0.6",
+    "html-minifier": "^3.5.21",
+    "jsdom": "^16.6.0",
+    "mkdirp": "^1.0.4",
+    "postcss": "^8.3.5",
+    "postcss-nested": "^5.0.5",
+    "terser": "^5.7.1"
+  },
+  "devDependencies": {
+    "@types/cssnano": "^5.0.0",
+    "@types/html-minifier": "^4.0.2",
+    "@types/jsdom": "^16.2.14",
+    "@types/mkdirp": "^1.0.2",
+    "@types/node": "^17.0.21",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5"
+  }
+}
