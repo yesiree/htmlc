@@ -1,8 +1,7 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A simple tool for compiling HTML files",
-  "type": "module",
   "files": [
     "./index.js",
     "./index.d.ts"
@@ -12,7 +11,8 @@
     "htmlc": "index.js"
   },
   "scripts": {
-    "build": "rimraf ./index.js ./index.d.ts && tsc"
+    "build": "rimraf ./index.js ./index.d.ts && tsc",
+    "demo": "npm run build && node . -s demo/src/index.html -o demo/dist/index.html -m"
   },
   "repository": {
     "type": "git",
@@ -41,6 +41,7 @@
     "cssnano": "^5.0.6",
     "html-minifier": "^3.5.21",
     "jsdom": "^16.6.0",
+    "minimist": "^1.2.6",
     "mkdirp": "^1.0.4",
     "postcss": "^8.3.5",
     "postcss-nested": "^5.0.5",
@@ -50,6 +51,7 @@
     "@types/cssnano": "^5.0.0",
     "@types/html-minifier": "^4.0.2",
     "@types/jsdom": "^16.2.14",
+    "@types/minimist": "^1.2.2",
     "@types/mkdirp": "^1.0.2",
     "@types/node": "^17.0.21",
     "rimraf": "^3.0.2",

@@ -10,6 +10,7 @@ import htmlMinifier from 'html-minifier'
 import chokidar from 'chokidar'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
+import minimist from 'minimist'
 
 
 export const read = (path: string): Promise<string> => {
@@ -42,9 +43,10 @@ const getBasePath = (src: string, dom: jsdom.JSDOM) => {
     : srcDir
 }
 
-export const htmlc = async ({ src, dest }: {
-  src: string
-  dest: string
+const compile = async({ src, out, minify }: {
+  src: string,
+  out: string,
+  minify: boolean,
 }) => {
   const dom = new jsdom.JSDOM(
     await read(src), {
@@ -53,7 +55,10 @@ export const htmlc = async ({ src, dest }: {
   const doc = dom.window.document
   const root = getBasePath(src, dom)
 
-  const cssMinifier = postcss([nestedcss, cssnano])
+  const plugins: any[] = [nestedcss]
+  if (minify) plugins.push(cssnano)
+
+  const cssMinifier = postcss(plugins)
   const cssPromise = Promise.all(
     Array
       .from(doc.querySelectorAll('link[rel="stylesheet"]'))
@@ -97,7 +102,7 @@ export const htmlc = async ({ src, dest }: {
         })
     )
     .then(async () => {
-      const code = Array
+      let code = Array
         .from(doc.querySelectorAll('script'))
         .map(script => {
           const text = script.textContent
@@ -106,8 +111,11 @@ export const htmlc = async ({ src, dest }: {
         })
         .join(';')
       const script = doc.createElement('script')
-      const result = await terser.minify(code, { toplevel: true })
-      script.textContent = result.code || ''
+      if (minify) {
+        const result = await terser.minify(code, { toplevel: true })
+        code = result.code || ''
+      }
+      script.textContent = code
       doc.body.append(script)
     })
 
@@ -119,27 +127,35 @@ export const htmlc = async ({ src, dest }: {
     removeComments: true
   })
 
-  await write(dest, html)
+  await write(out, html)
+}
+
+
+export const htmlc = async ({ src, out, watch, minify }: {
+  src: string
+  out: string
+  watch: boolean
+  minify: boolean
+}) => {
+  if (watch) {
+    const sourceGlob = resolve(dirname(src), '**')
+    const update = () => compile({ src, out, minify })
+    return chokidar
+      .watch(sourceGlob)
+      .on('change', update)
+      .on('add', update)
+      .on('unlink', update)
+  } else {
+    await compile({ src, out, minify })
+  }
 }
 
 
 if (module === require.main) {
-  const src = process.argv[2] || './src/index.html'
-  const dest = process.argv[3] || './dist/index.html'
-  const watch = process.argv[4] === 'watch'
-  try {
-    if (watch) {
-      const srcGlob = resolve(dirname(src), '**')
-      const update = () => htmlc({ src, dest })
-      chokidar
-        .watch(srcGlob)
-        .on('change', update)
-        .on(' unlink', update)
-        .on('add', update)
-    } else {
-      htmlc({ src, dest })
-    }
-  } catch (err) {
-    console.error(err)
-  }
+  const args = minimist(process.argv.slice(2))
+  const source = args.s || args.src || args.source || 'src/index.html'
+  const output = args.o || args.out || args.output || 'out/index.html'
+  const watch = args.w || args.watch || false
+  const minify = args.m || args.minify || false
+  htmlc({ src: source, out: output, watch, minify })
 }

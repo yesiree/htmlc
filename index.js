@@ -15,6 +15,7 @@ const html_minifier_1 = __importDefault(require("html-minifier"));
 const chokidar_1 = __importDefault(require("chokidar"));
 const fs_1 = __importDefault(require("fs"));
 const mkdirp_1 = __importDefault(require("mkdirp"));
+const minimist_1 = __importDefault(require("minimist"));
 const read = (path) => {
     return new Promise((resolve, reject) => {
         fs_1.default.readFile(path, (err, data) => {
@@ -47,7 +48,7 @@ const getBasePath = (src, dom) => {
         ? (0, path_1.resolve)(srcDir, baseUrl)
         : srcDir;
 };
-const htmlc = async ({ src, dest }) => {
+const compile = async ({ src, dest, minify }) => {
     const dom = new jsdom_1.default.JSDOM(await (0, exports.read)(src), {
         virtualConsole: new jsdom_1.default.VirtualConsole()
     });
@@ -109,26 +110,26 @@ const htmlc = async ({ src, dest }) => {
     });
     await (0, exports.write)(dest, html);
 };
+const htmlc = async ({ src, dest, watch = false, minify = false }) => {
+    if (watch) {
+        const sourceGlob = (0, path_1.resolve)((0, path_1.dirname)(src), '**');
+        const update = () => compile({ src, dest, minify });
+        chokidar_1.default
+            .watch(sourceGlob)
+            .on('change', update)
+            .on('add', update)
+            .on('unlink', update);
+    }
+    else {
+        await compile({ src, dest, minify });
+    }
+};
 exports.htmlc = htmlc;
 if (module === require.main) {
-    const src = process.argv[2] || './src/index.html';
-    const dest = process.argv[3] || './dist/index.html';
-    const watch = process.argv[4] === 'watch';
-    try {
-        if (watch) {
-            const srcGlob = (0, path_1.resolve)((0, path_1.dirname)(src), '**');
-            const update = () => (0, exports.htmlc)({ src, dest });
-            chokidar_1.default
-                .watch(srcGlob)
-                .on('change', update)
-                .on(' unlink', update)
-                .on('add', update);
-        }
-        else {
-            (0, exports.htmlc)({ src, dest });
-        }
-    }
-    catch (err) {
-        console.error(err);
-    }
+    const args = (0, minimist_1.default)(process.argv.slice(2));
+    const source = args.s || args.src || args.source || 'src/index.html';
+    const output = args.o || args.out || args.output || 'out/index.html';
+    const watch = args.w || args.watch || false;
+    const minify = args.m || args.minify || false;
+    (0, exports.htmlc)({ src: source, dest: output, watch, minify });
 }
