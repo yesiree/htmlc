@@ -1,6 +1,6 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple tool for compiling HTML files",
   "files": [
     "./index.js",
