@@ -12,6 +12,7 @@ const postcss_1 = __importDefault(require("postcss"));
 const postcss_nested_1 = __importDefault(require("postcss-nested"));
 const cssnano_1 = __importDefault(require("cssnano"));
 const html_minifier_1 = __importDefault(require("html-minifier"));
+const js_beautify_1 = __importDefault(require("js-beautify"));
 const chokidar_1 = __importDefault(require("chokidar"));
 const fs_1 = __importDefault(require("fs"));
 const mkdirp_1 = __importDefault(require("mkdirp"));
@@ -48,13 +49,16 @@ const getBasePath = (src, dom) => {
         ? (0, path_1.resolve)(srcDir, baseUrl)
         : srcDir;
 };
-const compile = async ({ src, dest, minify }) => {
+const compile = async ({ src, out, minify }) => {
     const dom = new jsdom_1.default.JSDOM(await (0, exports.read)(src), {
         virtualConsole: new jsdom_1.default.VirtualConsole()
     });
     const doc = dom.window.document;
     const root = getBasePath(src, dom);
-    const cssMinifier = (0, postcss_1.default)([postcss_nested_1.default, cssnano_1.default]);
+    const plugins = [postcss_nested_1.default];
+    if (minify)
+        plugins.push(cssnano_1.default);
+    const cssMinifier = (0, postcss_1.default)(plugins);
     const cssPromise = Promise.all(Array
         .from(doc.querySelectorAll('link[rel="stylesheet"]'))
         .map(async (styleLink) => {
@@ -90,7 +94,7 @@ const compile = async ({ src, dest, minify }) => {
         script.removeAttribute('src');
     }))
         .then(async () => {
-        const code = Array
+        let code = Array
             .from(doc.querySelectorAll('script'))
             .map(script => {
             const text = script.textContent;
@@ -99,29 +103,39 @@ const compile = async ({ src, dest, minify }) => {
         })
             .join(';');
         const script = doc.createElement('script');
-        const result = await terser_1.default.minify(code, { toplevel: true });
-        script.textContent = result.code || '';
+        if (minify) {
+            const result = await terser_1.default.minify(code, { toplevel: true });
+            code = result.code || '';
+        }
+        script.textContent = `\n${code}`;
         doc.body.append(script);
     });
     await Promise.all([cssPromise, jsPromise]);
-    const html = html_minifier_1.default.minify(dom.serialize(), {
-        collapseWhitespace: true,
-        removeComments: true
-    });
-    await (0, exports.write)(dest, html);
+    const html = minify
+        ? html_minifier_1.default.minify(dom.serialize(), {
+            collapseWhitespace: true,
+            removeComments: true,
+        })
+        : js_beautify_1.default.html(dom.serialize(), {
+            indent_size: 2,
+            indent_char: ' ',
+            eol: '\n',
+            preserve_newlines: false
+        });
+    await (0, exports.write)(out, html);
 };
-const htmlc = async ({ src, dest, watch = false, minify = false }) => {
+const htmlc = async ({ src, out, watch, minify }) => {
     if (watch) {
         const sourceGlob = (0, path_1.resolve)((0, path_1.dirname)(src), '**');
-        const update = () => compile({ src, dest, minify });
-        chokidar_1.default
+        const update = () => compile({ src, out, minify });
+        return chokidar_1.default
             .watch(sourceGlob)
             .on('change', update)
             .on('add', update)
             .on('unlink', update);
     }
     else {
-        await compile({ src, dest, minify });
+        await compile({ src, out, minify });
     }
 };
 exports.htmlc = htmlc;
@@ -131,5 +145,5 @@ if (module === require.main) {
     const output = args.o || args.out || args.output || 'out/index.html';
     const watch = args.w || args.watch || false;
     const minify = args.m || args.minify || false;
-    (0, exports.htmlc)({ src: source, dest: output, watch, minify });
+    (0, exports.htmlc)({ src: source, out: output, watch, minify });
 }

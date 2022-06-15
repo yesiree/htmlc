@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+import chokidar from 'chokidar';
 export declare const read: (path: string) => Promise<string>;
 export declare const write: (path: string, data: any) => Promise<void>;
-export declare const htmlc: ({ src, dest, watch, minify }: {
+export declare const htmlc: ({ src, out, watch, minify }: {
     src: string;
-    dest: string;
-    watch?: boolean | undefined;
-    minify?: boolean | undefined;
-}) => Promise<void>;
+    out: string;
+    watch: boolean;
+    minify: boolean;
+}) => Promise<chokidar.FSWatcher | undefined>;

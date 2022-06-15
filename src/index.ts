@@ -7,6 +7,7 @@ import postcss from 'postcss'
 import nestedcss from 'postcss-nested'
 import cssnano from 'cssnano'
 import htmlMinifier from 'html-minifier'
+import htmlFormatter from 'js-beautify'
 import chokidar from 'chokidar'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
@@ -115,17 +116,24 @@ const compile = async({ src, out, minify }: {
         const result = await terser.minify(code, { toplevel: true })
         code = result.code || ''
       }
-      script.textContent = code
+      script.textContent = `\n${code}`
       doc.body.append(script)
     })
 
 
   await Promise.all([cssPromise, jsPromise])
 
-  const html = htmlMinifier.minify(dom.serialize(), {
-    collapseWhitespace: true,
-    removeComments: true
-  })
+  const html = minify
+    ? htmlMinifier.minify(dom.serialize(), {
+      collapseWhitespace: true,
+      removeComments: true,
+    })
+    : htmlFormatter.html(dom.serialize(), {
+      indent_size: 2,
+      indent_char: ' ',
+      eol: '\n',
+      preserve_newlines: false
+    })
 
   await write(out, html)
 }
