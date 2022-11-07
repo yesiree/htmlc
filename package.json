@@ -1,6 +1,6 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple tool for compiling HTML files",
   "files": [
     "./index.js",
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "rimraf ./index.js ./index.d.ts && tsc",
-    "demo": "npm run build && node . -s demo/src/index.html -o demo/dist/index.html"
+    "demo": "npm run build && node . -m -s demo/src/index.html -o demo/dist/index.html"
   },
   "repository": {
     "type": "git",

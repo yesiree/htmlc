@@ -49,14 +49,14 @@ const getBasePath = (src, dom) => {
         ? (0, path_1.resolve)(srcDir, baseUrl)
         : srcDir;
 };
-const compile = async ({ src, out, minify }) => {
+const compile = async ({ src, out, compress, module }) => {
     const dom = new jsdom_1.default.JSDOM(await (0, exports.read)(src), {
         virtualConsole: new jsdom_1.default.VirtualConsole()
     });
     const doc = dom.window.document;
     const root = getBasePath(src, dom);
     const plugins = [postcss_nested_1.default];
-    if (minify)
+    if (compress)
         plugins.push(cssnano_1.default);
     const cssMinifier = (0, postcss_1.default)(plugins);
     const cssPromise = Promise.all(Array
@@ -103,15 +103,17 @@ const compile = async ({ src, out, minify }) => {
         })
             .join(';');
         const script = doc.createElement('script');
-        if (minify) {
+        if (compress) {
             const result = await terser_1.default.minify(code, { toplevel: true });
             code = result.code || '';
         }
         script.textContent = `\n${code}`;
+        if (module)
+            script.setAttribute('type', 'module');
         doc.body.append(script);
     });
     await Promise.all([cssPromise, jsPromise]);
-    const html = minify
+    const html = compress
         ? html_minifier_1.default.minify(dom.serialize(), {
             collapseWhitespace: true,
             removeComments: true,
@@ -124,10 +126,10 @@ const compile = async ({ src, out, minify }) => {
         });
     await (0, exports.write)(out, html);
 };
-const htmlc = async ({ src, out, watch, minify }) => {
+const htmlc = async ({ src, out, watch, compress, module }) => {
     if (watch) {
         const sourceGlob = (0, path_1.resolve)((0, path_1.dirname)(src), '**');
-        const update = () => compile({ src, out, minify });
+        const update = () => compile({ src, out, compress, module });
         return chokidar_1.default
             .watch(sourceGlob)
             .on('change', update)
@@ -135,7 +137,7 @@ const htmlc = async ({ src, out, watch, minify }) => {
             .on('unlink', update);
     }
     else {
-        await compile({ src, out, minify });
+        await compile({ src, out, compress, module });
     }
 };
 exports.htmlc = htmlc;
@@ -144,6 +146,7 @@ if (module === require.main) {
     const source = args.s || args.src || args.source || 'src/index.html';
     const output = args.o || args.out || args.output || 'out/index.html';
     const watch = args.w || args.watch || false;
-    const minify = args.m || args.minify || false;
-    (0, exports.htmlc)({ src: source, out: output, watch, minify });
+    const compress = args.c || args.compress || false;
+    const module = args.m || args.module || false;
+    (0, exports.htmlc)({ src: source, out: output, watch, compress: compress, module });
 }

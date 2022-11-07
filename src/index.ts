@@ -44,10 +44,11 @@ const getBasePath = (src: string, dom: jsdom.JSDOM) => {
     : srcDir
 }
 
-const compile = async({ src, out, minify }: {
-  src: string,
-  out: string,
-  minify: boolean,
+const compile = async({ src, out, compress, module }: {
+  src: string
+  out: string
+  compress: boolean
+  module: boolean
 }) => {
   const dom = new jsdom.JSDOM(
     await read(src), {
@@ -57,7 +58,7 @@ const compile = async({ src, out, minify }: {
   const root = getBasePath(src, dom)
 
   const plugins: any[] = [nestedcss]
-  if (minify) plugins.push(cssnano)
+  if (compress) plugins.push(cssnano)
 
   const cssMinifier = postcss(plugins)
   const cssPromise = Promise.all(
@@ -112,18 +113,19 @@ const compile = async({ src, out, minify }: {
         })
         .join(';')
       const script = doc.createElement('script')
-      if (minify) {
+      if (compress) {
         const result = await terser.minify(code, { toplevel: true })
         code = result.code || ''
       }
       script.textContent = `\n${code}`
+      if (module) script.setAttribute('type', 'module')
       doc.body.append(script)
     })
 
 
   await Promise.all([cssPromise, jsPromise])
 
-  const html = minify
+  const html = compress
     ? htmlMinifier.minify(dom.serialize(), {
       collapseWhitespace: true,
       removeComments: true,
@@ -139,22 +141,23 @@ const compile = async({ src, out, minify }: {
 }
 
 
-export const htmlc = async ({ src, out, watch, minify }: {
+export const htmlc = async ({ src, out, watch, compress, module }: {
   src: string
   out: string
   watch: boolean
-  minify: boolean
+  compress: boolean
+  module: boolean
 }) => {
   if (watch) {
     const sourceGlob = resolve(dirname(src), '**')
-    const update = () => compile({ src, out, minify })
+    const update = () => compile({ src, out, compress, module })
     return chokidar
       .watch(sourceGlob)
       .on('change', update)
       .on('add', update)
       .on('unlink', update)
   } else {
-    await compile({ src, out, minify })
+    await compile({ src, out, compress, module })
   }
 }
 
@@ -164,6 +167,7 @@ if (module === require.main) {
   const source = args.s || args.src || args.source || 'src/index.html'
   const output = args.o || args.out || args.output || 'out/index.html'
   const watch = args.w || args.watch || false
-  const minify = args.m || args.minify || false
-  htmlc({ src: source, out: output, watch, minify })
+  const compress = args.c || args.compress || false
+  const module = args.m || args.module || false
+  htmlc({ src: source, out: output, watch, compress: compress, module })
 }
