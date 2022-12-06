@@ -19,4 +19,13 @@ if (DEBUG) {
   console.dir({ DEBUG, source, dist, watch, compress, module, ext })
 }
 
+if (typeof source !== 'string') {
+  console.log(`Source parameter must be a path to a directory. Found '${source}'.`)
+  process.exit(1)
+}
+if (typeof dist !== 'string') {
+  console.log(`Dist parameter must be a path to a directory. Found '${dist}'.`)
+  process.exit(1)
+}
+
 htmlc({ source, dist, watch, compress, module, ext, quiet })

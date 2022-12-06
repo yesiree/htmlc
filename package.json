@@ -13,7 +13,9 @@
     "htmlc": "cli.js"
   },
   "scripts": {
-    "example": "node cli.js -s example/src/ -d example/dist/"
+    "test": "npm run example && npm run compare",
+    "example": "node cli.js -m -c -s test/src/ -d .ignore/ ",
+    "compare": "node test/equals.js .ignore/index.html test/expected.html"
   },
   "repository": {
     "type": "git",
