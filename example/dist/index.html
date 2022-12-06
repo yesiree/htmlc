@@ -22,12 +22,12 @@
 </head>
 
 <body>
-  <h1>Welcome.</h1>
+  <h1>Welcome!</h1>
   <p>This page is a demonstration. Take a look at the source code.</p>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelector('h1').textContent += ' (JavaScript is working!)'
-    })
+    document.addEventListener("DOMContentLoaded", (() => {
+      document.querySelector("h1").textContent += " (JavaScript is working!)"
+    }));
   </script>
 </body>
 
