@@ -1,6 +1,6 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A simple tool for compiling HTML files",
   "type": "module",
   "files": [
@@ -12,6 +12,7 @@
   "bin": "./lib/cli.js",
   "scripts": {
     "test": "npm run example && npm run compare",
+    "test-watch": "node lib/cli.js -m -c -w -s test/src/ -d .ignore/",
     "example": "node lib/cli.js -m -c -s test/src/ -d .ignore/ ",
     "compare": "node test/equals.js .ignore/index.html test/expected.html"
   },
@@ -44,6 +45,7 @@
     "html-minifier": "^4.0.0",
     "js-beautify": "^1.14.7",
     "jsdom": "^20.0.0",
+    "mime-types": "^2.1.35",
     "minimist": "^1.2.7",
     "mkdirp": "^1.0.4",
     "sass": "^1.53.0",

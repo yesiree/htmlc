@@ -1,3 +1,3 @@
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('h1').textContent += ' (JavaScript is working!)'
+  document.querySelector('#javascript').textContent += 'JavaScript is working!'
 })
