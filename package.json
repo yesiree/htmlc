@@ -4,14 +4,15 @@
   "description": "A simple tool for compiling HTML files",
   "type": "module",
   "files": [
-    "./cli.js",
-    "./index.js"
+    "./lib/cli.js",
+    "./lib/index.js",
+    "./lib/utils.js"
   ],
-  "main": "./index.js",
-  "bin": "cli.js",
+  "main": "./lib/index.js",
+  "bin": "./lib/cli.js",
   "scripts": {
     "test": "npm run example && npm run compare",
-    "example": "node cli.js -m -c -s test/src/ -d .ignore/ ",
+    "example": "node lib/cli.js -m -c -s test/src/ -d .ignore/ ",
     "compare": "node test/equals.js .ignore/index.html test/expected.html"
   },
   "repository": {
