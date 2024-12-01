@@ -1,11 +1,18 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A simple tool for compiling HTML files",
   "type": "module",
   "files": [
     "./lib/cli.js",
+    "./lib/commands.js",
+    "./lib/compile-css.js",
+    "./lib/compile-html.js",
+    "./lib/compile-img.js",
+    "./lib/compile-js.js",
     "./lib/index.js",
+    "./lib/logging.js",
+    "./lib/params.js",
     "./lib/utils.js"
   ],
   "main": "./lib/index.js",
