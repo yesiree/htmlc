@@ -1,6 +1,6 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A simple tool for compiling HTML files",
   "type": "module",
   "files": [
@@ -14,7 +14,7 @@
     "test-watch": "node lib/cli.js -m -c -w --src test/src/ --out .ignore/dest/",
     "example": "node lib/cli.js --no-compress --copy **/*.txt --src test/src/ --out .ignore/dest/",
     "compare": "node test/equals.js .ignore/dest/index.html test/expected.html",
-    "publish": "npm publish --access public"
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
