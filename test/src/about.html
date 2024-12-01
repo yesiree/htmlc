@@ -3,5 +3,14 @@
   <body>
     <h1>About</h1>
     <img src="water1.jpg" />
+    {% for i in range(5) %}
+      <p>{{ i }}</p>
+    {% endfor %}
+    <h1>People</h1>
+    {% for person in people %}
+      <p>Name: {{ person.name }}</p>
+      <p>Age: {{ person.age }}</p>
+      <p>City: {{ person.city }}</p>
+    {% endfor %}
   </body>
 </html>
