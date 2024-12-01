@@ -1,6 +1,6 @@
 {
   "name": "@yesiree/htmlc",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "description": "A simple tool for compiling HTML files",
   "type": "module",
   "files": [
@@ -45,12 +45,11 @@
     "fast-glob": "^3.3.2",
     "html-minifier-terser": "^7.2.0",
     "js-beautify": "^1.15.1",
-    "jsdom": "^20.0.0",
-    "mime-types": "^2.1.35",
+    "jsdom": "^25.0.1",
     "minimist": "^1.2.8",
     "mkdirp": "^3.0.1",
     "nunjucks": "^3.2.4",
-    "sass": "^1.80.6",
+    "sass": "^1.81.0",
     "sharp": "^0.33.5",
     "terser": "^5.36.0"
   },
