@@ -1,3 +1,8 @@
+# TODO
+ - [ ] Fix pathing for trailing index files
+ - [ ] Consider putting images in a separate folder
+ - [ ] Update docs
+
 # htmlc
 A simple tool for compiling HTML files
 
